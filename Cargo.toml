@@ -1,0 +1,9 @@
+[package]
+name = "medium_renderer"
+version = "0.1.0"
+authors = ["Lucas Kent <rubickent@gmail.com>"]
+
+[dependencies]
+vulkano = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
+vulkano-win = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
+vulkano-shaders = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
