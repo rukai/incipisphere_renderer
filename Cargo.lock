@@ -296,6 +296,7 @@ dependencies = [
  "vulkano 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "vulkano-shaders 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "vulkano-win 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
+ "winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
