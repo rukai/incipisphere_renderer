@@ -35,7 +35,7 @@ impl State {
 
     fn keypress(&mut self, key_code: VirtualKeyCode) {
         match key_code {
-            VirtualKeyCode::A => {
+            VirtualKeyCode::Z => {
                 self.render_mode = match self.render_mode {
                     RenderMode::Standard => { RenderMode::Wireframe }
                     RenderMode::Wireframe => { RenderMode::Standard }

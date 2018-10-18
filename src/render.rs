@@ -17,6 +17,8 @@ use vulkano::swapchain;
 use vulkano::sync;
 use vulkano::sync::{GpuFuture, FlushError};
 use vulkano_shaders::vulkano_shader;
+use genmesh::generators::IcoSphere;
+use genmesh::{MapToVertices, Vertices};
 
 use std::iter;
 use std::sync::Arc;
@@ -26,7 +28,7 @@ use state::State;
 use state::RenderMode;
 
 #[derive(Debug, Clone)]
-struct Vertex { position: [f32; 2] }
+struct Vertex { position: [f32; 3] }
 impl_vertex!(Vertex, position);
 
 vulkano_shader!{
@@ -42,18 +44,19 @@ vulkano_shader!{
 }
 
 pub struct Render {
-    surface:      Arc<Surface<Window>>,
-    device:       Arc<Device>,
-    future:       Box<GpuFuture>,
-    swapchain:    Arc<Swapchain<Window>>,
-    queue:        Arc<Queue>,
-    vs:           vs::Shader,
-    fs:           fs::Shader,
-    pipelines:    Pipelines,
-    render_pass:  Arc<RenderPassAbstract + Send + Sync>,
-    framebuffers: Vec<Arc<FramebufferAbstract + Send + Sync>>,
-    width:        u32,
-    height:       u32,
+    surface:              Arc<Surface<Window>>,
+    device:               Arc<Device>,
+    future:               Box<GpuFuture>,
+    swapchain:            Arc<Swapchain<Window>>,
+    queue:                Arc<Queue>,
+    vs:                   vs::Shader,
+    fs:                   fs::Shader,
+    pipelines:            Pipelines,
+    render_pass:          Arc<RenderPassAbstract + Send + Sync>,
+    framebuffers:         Vec<Arc<FramebufferAbstract + Send + Sync>>,
+    width:                u32,
+    height:               u32,
+    vertex_buffer_sphere: Arc<CpuAccessibleBuffer<[Vertex]>>,
 }
 
 struct Pipelines {
@@ -103,7 +106,13 @@ impl Render {
 
         let (render_pass, pipelines, framebuffers) = Render::pipelines(&vs, &fs, device.clone(), swapchain.clone(), &images);
 
-        Render { surface, device, future, swapchain, queue, vs, fs, pipelines, render_pass, framebuffers, width: 0, height: 0 }
+        let sphere: Vec<_> = IcoSphere::subdivide(4)
+            .vertex(|v| Vertex { position: v.pos.into() })
+            .vertices()
+            .collect();
+        let vertex_buffer_sphere = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), sphere.iter().cloned()).unwrap();
+
+        Render { surface, device, future, swapchain, queue, vs, fs, pipelines, render_pass, framebuffers, width: 0, height: 0, vertex_buffer_sphere }
     }
 
     fn pipelines(
@@ -218,14 +227,6 @@ impl Render {
             Err(err) => panic!("{:?}", err)
         };
 
-        let vertex_buffer = {
-            CpuAccessibleBuffer::from_iter(self.device.clone(), BufferUsage::all(), [
-                Vertex { position: [-0.5, -0.25] },
-                Vertex { position: [0.0, 0.5] },
-                Vertex { position: [0.25, -0.1] }
-            ].iter().cloned()).expect("failed to create buffer")
-        };
-
         let pipeline = match state.render_mode {
             RenderMode::Standard => self.pipelines.standard.clone(),
             RenderMode::Wireframe => self.pipelines.wireframe.clone(),
@@ -233,7 +234,7 @@ impl Render {
 
         let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(self.device.clone(), self.queue.family()).unwrap()
             .begin_render_pass(self.framebuffers[image_num].clone(), false, vec![[0.0, 0.0, 0.0, 1.0].into()]).unwrap()
-            .draw(pipeline, &DynamicState::none(), vertex_buffer.clone(), (), ()).unwrap()
+            .draw(pipeline, &DynamicState::none(), self.vertex_buffer_sphere.clone(), (), ()).unwrap()
             .end_render_pass().unwrap()
             .build().unwrap();
 
@@ -245,7 +246,10 @@ impl Render {
             .then_signal_fence_and_flush();
 
         self.future = match future {
-            Ok(future) => Box::new(future) as Box<_>,
+            Ok(future) => {
+                future.wait(None).unwrap(); // TODO: Pretty sure this is working around a bug in vulkano and shouldnt be here
+                Box::new(future) as Box<_>
+            }
             Err(FlushError::OutOfDate) => { return false }
             Err(e) => panic!("{:?}", e)
         };

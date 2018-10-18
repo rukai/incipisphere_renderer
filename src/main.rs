@@ -3,6 +3,7 @@ extern crate vulkano;
 extern crate vulkano_shaders;
 extern crate winit;
 extern crate vulkano_win;
+extern crate genmesh;
 
 mod render;
 mod state;
