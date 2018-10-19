@@ -7,8 +7,10 @@ use vulkano::command_buffer::{DynamicState, AutoCommandBufferBuilder};
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
 use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 use vulkano::device::{Device, Queue, DeviceExtensions};
+use vulkano::format::Format;
 use vulkano::framebuffer::{Framebuffer, FramebufferAbstract, Subpass, RenderPassAbstract};
 use vulkano::image::SwapchainImage;
+use vulkano::image::attachment::AttachmentImage;
 use vulkano::instance::{Instance, PhysicalDevice};
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::pipeline::vertex::SingleBufferDefinition;
@@ -134,19 +136,28 @@ impl Render {
                     store: Store,
                     format: swapchain.format(),
                     samples: 1,
+                },
+                depth: {
+                    load: Clear,
+                    store: DontCare,
+                    format: Format::D16Unorm,
+                    samples: 1,
                 }
             },
             pass: {
                 color: [color],
-                depth_stencil: {}
+                depth_stencil: {depth}
             }
         ).unwrap()) as Arc<RenderPassAbstract + Send + Sync>;
 
         let dimensions = images[0].dimensions();
+        let depth_buffer = AttachmentImage::transient(device.clone(), dimensions, Format::D16Unorm).unwrap();
+
         let framebuffers = images.iter().map(|image| {
             Arc::new(
                 Framebuffer::start(render_pass.clone())
                 .add(image.clone()).unwrap()
+                .add(depth_buffer.clone()).unwrap()
                 .build().unwrap()
             ) as Arc<FramebufferAbstract + Send + Sync>
         }).collect::<Vec<_>>();
@@ -178,6 +189,7 @@ impl Render {
                 dimensions
             }))
             .fragment_shader(fs.main_entry_point(), ())
+            .depth_stencil_simple_depth()
             .render_pass(Subpass::from(render_pass.clone(), 0).unwrap());
 
         let builder = if wireframe {
@@ -244,7 +256,7 @@ impl Render {
         .begin_render_pass(
             self.framebuffers[image_num].clone(),
             false,
-            vec![[0.0, 0.0, 0.0, 1.0].into()]
+            vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()]
         ).unwrap();
 
         let aspect = self.width as f32 / self.height as f32;
