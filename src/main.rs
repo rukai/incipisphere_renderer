@@ -12,9 +12,9 @@ mod state;
 
 use render::Render;
 use state::State;
-use winit_input_helper::WinitInputHelper;
 
 use winit::EventsLoop;
+use winit_input_helper::WinitInputHelper;
 
 fn main() {
     let mut events_loop = EventsLoop::new();

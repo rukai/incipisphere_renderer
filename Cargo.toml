@@ -1,6 +1,7 @@
 [package]
-name = "medium_renderer"
+name = "incipisphere_renderer"
 version = "0.1.0"
+license = "MIT"
 authors = ["Lucas Kent <rubickent@gmail.com>"]
 
 [dependencies]
@@ -10,4 +11,4 @@ vulkano-shaders = { git = "https://github.com/rukai/vulkano", branch = "proc_mac
 winit = "0.17"
 genmesh = "0.6"
 nalgebra-glm = "0.1"
-winit_input_helper = { path = "/home/rubic/Projects/Crates/winit_input_helper" }
+winit_input_helper = "0.1"

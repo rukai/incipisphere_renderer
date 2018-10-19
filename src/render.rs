@@ -79,7 +79,7 @@ impl Render {
         println!("Using device: {} (type: {:?})", physical_device.name(), physical_device.ty());
 
         let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
-        surface.window().set_title("Medium Renderer");
+        surface.window().set_title("Incipisphere Renderer");
 
         let queue_family = physical_device.queue_families().find(|&q| {
             q.supports_graphics() && surface.is_supported(q).unwrap_or(false)
