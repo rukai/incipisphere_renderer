@@ -5,12 +5,14 @@ extern crate winit;
 extern crate vulkano_win;
 extern crate genmesh;
 extern crate nalgebra_glm as glm;
+extern crate winit_input_helper;
 
 mod render;
 mod state;
 
 use render::Render;
 use state::State;
+use winit_input_helper::WinitInputHelper;
 
 use winit::EventsLoop;
 
@@ -18,9 +20,11 @@ fn main() {
     let mut events_loop = EventsLoop::new();
     let mut render = Render::new(&events_loop);
     let mut state = State::new();
+    let mut input = WinitInputHelper::new();
 
-    while state.run {
+    while !input.quit() {
         render.draw(&state);
-        state.update(&mut events_loop);
+        input.update(&mut events_loop);
+        state.update(&input);
     }
 }

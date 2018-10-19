@@ -1,6 +1,8 @@
-use winit::{EventsLoop, Event, WindowEvent, ElementState, VirtualKeyCode, MouseScrollDelta};
+use winit::VirtualKeyCode;
 use glm;
 use glm::TVec3;
+
+use winit_input_helper::WinitInputHelper;
 
 pub struct State {
     pub camera: Camera,
@@ -41,31 +43,38 @@ impl State {
         }
     }
 
-    pub fn update(&mut self, events_loop: &mut EventsLoop) {
-        events_loop.poll_events(|event| {
-            if let Event::WindowEvent { event, .. } = &event {
-                match event {
-                    WindowEvent::CloseRequested | WindowEvent::Destroyed => { self.run = false }
-                    WindowEvent::KeyboardInput { input, .. } => {
-                        if let ElementState::Pressed = input.state {
-                            if let Some(key_code) = input.virtual_keycode {
-                                match key_code {
-                                    VirtualKeyCode::Z => {
-                                        self.render_mode = match self.render_mode {
-                                            RenderMode::Standard => { RenderMode::Wireframe }
-                                            RenderMode::Wireframe => { RenderMode::Standard }
-                                        };
-                                    }
-                                    _ => { }
-                                }
-                            }
-                        }
-                    }
-                    _ => {}
+    pub fn update(&mut self, input: &WinitInputHelper) {
+        if input.key_pressed(VirtualKeyCode::Z) {
+            self.render_mode = match self.render_mode {
+                RenderMode::Standard => { RenderMode::Wireframe }
+                RenderMode::Wireframe => { RenderMode::Standard }
+            };
+        }
+        match &mut self.camera {
+            &mut Camera::Free { ref mut eye, ref mut look_dir } => {
+                if input.key_pressed(VirtualKeyCode::A) {
+                    eye.x -= 0.5;
                 }
-                self.camera.update(event);
+                if input.key_pressed(VirtualKeyCode::D) {
+                    eye.x += 0.5;
+                }
+                if input.key_pressed(VirtualKeyCode::W) {
+                    eye.y -= 0.5;
+                }
+                if input.key_pressed(VirtualKeyCode::S) {
+                    eye.y += 0.5;
+                }
+
+                if input.mouse_held(0) {
+                    let mouse_diff = input.mouse_diff();
+                    look_dir.x += mouse_diff.0 / 10.0;
+                    look_dir.y += mouse_diff.1 / 10.0;
+                }
+
+                eye.z -= input.scroll_diff();
             }
-        });
+            Camera::LookAtEntity { .. } => unimplemented!(),
+        }
     }
 }
 
@@ -73,7 +82,7 @@ impl State {
 pub enum Camera {
     Free {
         eye: TVec3<f32>,
-        look_dir: TVec3<f32> // TODO: control with click and drag
+        look_dir: TVec3<f32>
     },
     LookAtEntity {
         planet_index: usize, // TODO: click on entity to select
@@ -99,40 +108,6 @@ impl Camera {
             Camera::LookAtEntity { .. } => {
                 unimplemented!()
             }
-        }
-    }
-
-    pub fn update(&mut self, event: &WindowEvent) {
-        match self {
-            &mut Camera::Free { ref mut eye, ref mut look_dir } => {
-                match event {
-                    WindowEvent::KeyboardInput { input, .. } => {
-                        if let ElementState::Pressed = input.state {
-                            if let Some(key_code) = input.virtual_keycode {
-                                match key_code {
-                                    VirtualKeyCode::A => { eye.x -= 0.5 }
-                                    VirtualKeyCode::D => { eye.x += 0.5 }
-                                    VirtualKeyCode::W => { eye.y -= 0.5 }
-                                    VirtualKeyCode::S => { eye.y += 0.5 }
-                                    _ => { }
-                                }
-                            }
-                        }
-                    }
-                    WindowEvent::MouseWheel { delta, .. } => {
-                        match delta {
-                            MouseScrollDelta::LineDelta  (_, y) => { eye.z -= y }
-                            MouseScrollDelta::PixelDelta (_) => panic!("Ooer, I dont know how to handle PixelDelta...") // TODO
-                        }
-                    }
-                    WindowEvent::CursorMoved { position, .. } => {
-                        look_dir.x += position.x as f32;
-                        look_dir.y += position.y as f32;
-                    }
-                    _ => {}
-                }
-            }
-            Camera::LookAtEntity { .. } => { } // TODO
         }
     }
 }

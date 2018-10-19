@@ -364,6 +364,7 @@ dependencies = [
  "vulkano-shaders 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "vulkano-win 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit_input_helper 0.1.0",
 ]
 
 [[package]]
@@ -836,6 +837,13 @@ dependencies = [
  "wayland-client 0.20.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "x11-dl 2.18.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "winit_input_helper"
+version = "0.1.0"
+dependencies = [
+ "winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
