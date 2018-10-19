@@ -1,9 +1,10 @@
 use winit::{Window, WindowBuilder, EventsLoop};
 use vulkano_win;
 use vulkano_win::VkSurfaceBuild;
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::buffer::cpu_pool::CpuBufferPool;
 use vulkano::command_buffer::{DynamicState, AutoCommandBufferBuilder};
+use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
 use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 use vulkano::device::{Device, Queue, DeviceExtensions};
 use vulkano::framebuffer::{Framebuffer, FramebufferAbstract, Subpass, RenderPassAbstract};
@@ -19,13 +20,14 @@ use vulkano::sync::{GpuFuture, FlushError};
 use vulkano_shaders::vulkano_shader;
 use genmesh::generators::IcoSphere;
 use genmesh::{MapToVertices, Vertices};
+use glm;
 
 use std::iter;
 use std::sync::Arc;
 use std::mem;
+use std::f32::consts::FRAC_PI_2;
 
-use state::State;
-use state::RenderMode;
+use state::{State, RenderMode, EntityType};
 
 #[derive(Debug, Clone)]
 struct Vertex { position: [f32; 3] }
@@ -44,18 +46,20 @@ vulkano_shader!{
 }
 
 pub struct Render {
-    surface:              Arc<Surface<Window>>,
-    device:               Arc<Device>,
-    future:               Box<GpuFuture>,
-    swapchain:            Arc<Swapchain<Window>>,
-    queue:                Arc<Queue>,
-    vs:                   vs::Shader,
-    fs:                   fs::Shader,
-    pipelines:            Pipelines,
-    render_pass:          Arc<RenderPassAbstract + Send + Sync>,
-    framebuffers:         Vec<Arc<FramebufferAbstract + Send + Sync>>,
-    width:                u32,
-    height:               u32,
+    surface:                Arc<Surface<Window>>,
+    device:                 Arc<Device>,
+    future:                 Box<GpuFuture>,
+    swapchain:              Arc<Swapchain<Window>>,
+    width:                  u32,
+    height:                 u32,
+    queue:                  Arc<Queue>,
+    vs:                     vs::Shader,
+    fs:                     fs::Shader,
+    pipelines:              Pipelines,
+    render_pass:            Arc<RenderPassAbstract + Send + Sync>,
+    framebuffers:           Vec<Arc<FramebufferAbstract + Send + Sync>>,
+    vs_uniform_buffer_pool: CpuBufferPool<vs::ty::VSData>,
+    fs_uniform_buffer_pool: CpuBufferPool<fs::ty::FSData>,
     vertex_buffer_sphere: Arc<CpuAccessibleBuffer<[Vertex]>>,
 }
 
@@ -66,12 +70,10 @@ struct Pipelines {
 
 impl Render {
     pub fn new(events_loop: &EventsLoop) -> Render {
-        let instance = {
-            let extensions = vulkano_win::required_extensions();
-            Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
-        };
+        let extensions = vulkano_win::required_extensions();
+        let instance = Instance::new(None, &extensions, None).unwrap();
 
-        let physical_device = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+        let physical_device = PhysicalDevice::enumerate(&instance).next().unwrap();
         println!("Using device: {} (type: {:?})", physical_device.name(), physical_device.ty());
 
         let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
@@ -90,21 +92,24 @@ impl Render {
 
         let queue = queues.next().unwrap();
 
-        let (swapchain, images) = {
-            let caps = surface.capabilities(physical_device)
-                             .expect("failed to get surface capabilities");
-            let dimensions = caps.current_extent.unwrap_or([1024, 768]);
-            let alpha = caps.supported_composite_alpha.iter().next().unwrap();
-            let format = caps.supported_formats[0].0;
-            Swapchain::new(device.clone(), surface.clone(), caps.min_image_count, format, dimensions, 1,
-                caps.supported_usage_flags, &queue, SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None
-            ).unwrap()
-        };
+        let caps = surface.capabilities(physical_device).unwrap();
+        let dimensions = caps.current_extent.unwrap_or([1024, 768]);
+        let alpha = caps.supported_composite_alpha.iter().next().unwrap();
+        let format = caps.supported_formats[0].0;
+        let (swapchain, images) = Swapchain::new(device.clone(), surface.clone(), caps.min_image_count, format, dimensions, 1,
+            caps.supported_usage_flags, &queue, SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None
+        ).unwrap();
+        let dimensions = images[0].dimensions();
+        let width = dimensions[0];
+        let height = dimensions[1];
 
-        let vs = vs::Shader::load(device.clone()).expect("failed to create shader module");
-        let fs = fs::Shader::load(device.clone()).expect("failed to create shader module");
+        let vs = vs::Shader::load(device.clone()).unwrap();
+        let fs = fs::Shader::load(device.clone()).unwrap();
 
         let (render_pass, pipelines, framebuffers) = Render::pipelines(&vs, &fs, device.clone(), swapchain.clone(), &images);
+
+        let vs_uniform_buffer_pool = CpuBufferPool::<vs::ty::VSData>::new(device.clone(), BufferUsage::all());
+        let fs_uniform_buffer_pool = CpuBufferPool::<fs::ty::FSData>::new(device.clone(), BufferUsage::all());
 
         let sphere: Vec<_> = IcoSphere::subdivide(4)
             .vertex(|v| Vertex { position: v.pos.into() })
@@ -112,7 +117,7 @@ impl Render {
             .collect();
         let vertex_buffer_sphere = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), sphere.iter().cloned()).unwrap();
 
-        Render { surface, device, future, swapchain, queue, vs, fs, pipelines, render_pass, framebuffers, width: 0, height: 0, vertex_buffer_sphere }
+        Render { surface, device, future, swapchain, width, height, queue, vs, fs, pipelines, render_pass, framebuffers, vs_uniform_buffer_pool, fs_uniform_buffer_pool, vertex_buffer_sphere }
     }
 
     fn pipelines(
@@ -232,11 +237,41 @@ impl Render {
             RenderMode::Wireframe => self.pipelines.wireframe.clone(),
         };
 
-        let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(self.device.clone(), self.queue.family()).unwrap()
-            .begin_render_pass(self.framebuffers[image_num].clone(), false, vec![[0.0, 0.0, 0.0, 1.0].into()]).unwrap()
-            .draw(pipeline, &DynamicState::none(), self.vertex_buffer_sphere.clone(), (), ()).unwrap()
-            .end_render_pass().unwrap()
-            .build().unwrap();
+        let mut cbb = AutoCommandBufferBuilder::primary_one_time_submit(
+            self.device.clone(),
+            self.queue.family()
+        ).unwrap()
+        .begin_render_pass(
+            self.framebuffers[image_num].clone(),
+            false,
+            vec![[0.0, 0.0, 0.0, 1.0].into()]
+        ).unwrap();
+
+        let aspect = self.width as f32 / self.height as f32;
+        let projection = glm::perspective(aspect, FRAC_PI_2, 0.01, 100.0);
+        let view = glm::look_at(&state.hack, &glm::vec3(0.0, 0.0, 0.0), &glm::vec3(0.0, 1.0, 0.0));
+
+        for entity in &state.entities {
+            let location = glm::translation(&entity.location);
+            let transform = (projection * view * location).into();
+
+            match entity.ty {
+                EntityType::BasicPlanet { color } => {
+                    let vs_uniform_buffer = self.vs_uniform_buffer_pool.next(vs::ty::VSData { transform }).unwrap();
+                    let fs_uniform_buffer = self.fs_uniform_buffer_pool.next(fs::ty::FSData { color }).unwrap();
+                    // TODO: PersistentDescriptrorSet should not be recreated every frame.
+                    // I'm pretty sure someone has mentioned this before.
+                    let descriptor_set = PersistentDescriptorSet::start(pipeline.clone(), 0)
+                        .add_buffer(vs_uniform_buffer).unwrap()
+                        .add_buffer(fs_uniform_buffer).unwrap()
+                        .build().unwrap();
+
+                    cbb = cbb.draw(pipeline.clone(), &DynamicState::none(), self.vertex_buffer_sphere.clone(), descriptor_set, ()).unwrap()
+                }
+            }
+        }
+
+        let command_buffer = cbb.end_render_pass().unwrap().build().unwrap();
 
         let mut old_future = Box::new(sync::now(self.device.clone())) as Box<GpuFuture>; // TODO: Can I avoid making this dummy future?
         mem::swap(&mut self.future, &mut old_future);

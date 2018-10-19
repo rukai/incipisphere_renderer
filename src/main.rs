@@ -4,6 +4,7 @@ extern crate vulkano_shaders;
 extern crate winit;
 extern crate vulkano_win;
 extern crate genmesh;
+extern crate nalgebra_glm as glm;
 
 mod render;
 mod state;

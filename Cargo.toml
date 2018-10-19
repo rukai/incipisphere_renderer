@@ -9,3 +9,4 @@ vulkano-win = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2
 vulkano-shaders = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
 winit = "0.17"
 genmesh = "0.6"
+nalgebra-glm = "0.1"
