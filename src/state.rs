@@ -19,26 +19,32 @@ impl State {
             ty: EntityType::BasicPlanet { color: [1.0, 1.0, 1.0, 1.0] },
         });
         entities.push(Entity {
-            location: glm::vec3(5.0, 0.0, 0.0),
+            location: glm::vec3(-5.0, 0.0, 0.0),
             ty: EntityType::BasicPlanet { color: [0.2, 0.5, 1.0, 1.0] },
         });
         entities.push(Entity {
-            location: glm::vec3(-5.0, 0.0, 0.0),
+            location: glm::vec3(5.0, 0.0, 0.0),
             ty: EntityType::BasicPlanet { color: [0.1, 0.7, 0.1, 1.0] },
         });
         entities.push(Entity {
-            location: glm::vec3(0.0, 0.0, 5.0),
+            location: glm::vec3(0.0, 0.0, -5.0),
             ty: EntityType::BasicPlanet { color: [0.0, 0.0, 0.4, 1.0] },
         });
         entities.push(Entity {
-            location: glm::vec3(0.0, 0.0, -5.0),
+            location: glm::vec3(0.0, 0.0, 5.0),
             ty: EntityType::BasicPlanet { color: [1.0, 0.0, 0.0, 1.0] },
         });
 
+        let camera = Camera {
+            eye: glm::vec3(0.0, 0.0, -8.0),
+            up: glm::vec3(0.0, -1.0, 0.0),
+            look_at: CameraLookAt::Dir(glm::vec3(0.0, 0.0, 1.0))
+        };
+
         State {
-            camera: Camera::Free { eye: glm::vec3(0.0, 0.0, 8.0), look_dir: glm::vec3(0.0, 0.0, -1.0) },
             render_mode: RenderMode::Standard,
             run: true,
+            camera,
             entities,
         }
     }
@@ -50,78 +56,71 @@ impl State {
                 RenderMode::Wireframe => { RenderMode::Standard }
             };
         }
-        match &mut self.camera {
-            &mut Camera::Free { ref mut eye, ref mut look_dir } => {
-                if input.key_pressed(VirtualKeyCode::A) {
-                    eye.x -= 0.5;
-                }
-                if input.key_pressed(VirtualKeyCode::D) {
-                    eye.x += 0.5;
-                }
-                if input.key_pressed(VirtualKeyCode::W) {
-                    eye.y -= 0.5;
-                }
-                if input.key_pressed(VirtualKeyCode::S) {
-                    eye.y += 0.5;
-                }
 
+        if input.mouse_pressed(1) {
+            // if clicked on entity
+            self.camera.look_at = CameraLookAt::Entity(0); // TODO: Get the clicked on entity
+
+            // if clicked on empty space
+            self.camera.look_at = CameraLookAt::Dir(glm::vec3(0.0, 0.0, -1.0)); // TODO: Set the direction such that the camera doesnt move.
+        }
+
+        match &mut self.camera.look_at {
+            &mut CameraLookAt::Dir ( ref mut dir ) => {
                 if input.mouse_held(0) {
                     let mouse_diff = input.mouse_diff();
-                    look_dir.x += mouse_diff.0 / 10.0;
-                    look_dir.y += mouse_diff.1 / 10.0;
+                    dir.x += mouse_diff.0 / 40.0;
+                    dir.y -= mouse_diff.1 / 40.0;
                 }
 
-                eye.z -= input.scroll_diff();
+                let mut trans_eye = glm::vec3(0.0, 0.0, 0.0);
+                if input.key_held(VirtualKeyCode::A) {
+                    trans_eye.x -= 0.1;
+                }
+                if input.key_held(VirtualKeyCode::D) {
+                    trans_eye.x += 0.1;
+                }
+                if input.key_held(VirtualKeyCode::W) {
+                    trans_eye.y += 0.1;
+                }
+                if input.key_held(VirtualKeyCode::S) {
+                    trans_eye.y -= 0.1;
+                }
+                trans_eye.z += input.scroll_diff();
+                // TODO: How do I move the camera in the axis it is looking
+                //let vec4 = glm::orientation(dir, &self.camera.up) * glm::vec3_to_vec4(&trans_eye);
+                //self.camera.eye += glm::vec4_to_vec3(&vec4);
+                self.camera.eye += trans_eye;
             }
-            Camera::LookAtEntity { .. } => unimplemented!(),
+            CameraLookAt::Entity { .. } => {
+                if input.mouse_held(0) {
+                    // self.camera.eye // TODO: control with click and drag
+                }
+                // self.camera.eye // TODO: scroll wheel needs to move away/towards the entity
+            }
         }
     }
 }
 
-#[allow(unused)]
-pub enum Camera {
-    Free {
-        eye: TVec3<f32>,
-        look_dir: TVec3<f32>
-    },
-    LookAtEntity {
-        planet_index: usize, // TODO: click on entity to select
-        distance: f32, // TODO: control with scroll wheel
-        x: f32, // TODO: control with click and drag horizontal
-        y: f32, // TODO: control with click and drag vertical
-    }
+pub struct Camera {
+    pub look_at: CameraLookAt,
+    pub up: TVec3<f32>,
+    pub eye: TVec3<f32>,
+}
+
+pub enum CameraLookAt {
+    Dir (TVec3<f32>),
+    Entity (usize)
 }
 
 impl Camera {
-    pub fn eye(&self) -> TVec3<f32> {
-        match self {
-            Camera::Free { eye, .. } => eye.clone(),
-            Camera::LookAtEntity { .. } => {
-                unimplemented!()
-            }
-        }
-    }
-
-    pub fn look_at(&self) -> TVec3<f32> {
-        match self {
-            Camera::Free { eye, look_dir } => eye + look_dir,
-            Camera::LookAtEntity { .. } => {
-                unimplemented!()
-            }
+    pub fn look_at(&self, entities: &[Entity]) -> TVec3<f32> {
+        match &self.look_at {
+            CameraLookAt::Dir (dir) => self.eye + dir,
+            CameraLookAt::Entity (index) => entities[*index].location,
         }
     }
 }
-
-//pub struct Camera {
-//    look_at: CameraLookAt,
-//    up: TVec3<f32>,
-//    location: TVec3<f32>,
-//}
-
-//pub enum CameraLookAt {
-//    Vector (TVec3<f32>),
-//    Planet (usize)
-//}
 
 pub enum RenderMode {
     Standard,

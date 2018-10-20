@@ -261,7 +261,7 @@ impl Render {
 
         let aspect = self.width as f32 / self.height as f32;
         let projection = glm::perspective(aspect, FRAC_PI_2, 0.01, 100.0);
-        let view = glm::look_at(&state.camera.eye(), &state.camera.look_at(), &glm::vec3(0.0, 1.0, 0.0));
+        let view = glm::look_at(&state.camera.eye, &state.camera.look_at(&state.entities), &state.camera.up);
 
         for entity in &state.entities {
             let location = glm::translation(&entity.location);

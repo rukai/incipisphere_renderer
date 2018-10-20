@@ -304,7 +304,7 @@ dependencies = [
  "vulkano-shaders 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "vulkano-win 0.10.0 (git+https://github.com/rukai/vulkano?branch=proc_macro_2_0)",
  "winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit_input_helper 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit_input_helper 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -841,7 +841,7 @@ dependencies = [
 
 [[package]]
 name = "winit_input_helper"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -966,6 +966,6 @@ dependencies = [
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 "checksum winapi-x86_64-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 "checksum winit 0.17.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ba44cf306b981badc781894ab5d6fda54764a0512cbbf8db4685d329014143fa"
-"checksum winit_input_helper 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b6edecf12d50bb0263948e6e388befd6e1ef15660ecdfcccd4ff61d32cf636fc"
+"checksum winit_input_helper 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c47a56b17945d69363c6004135b5ca7f05ff6bc70136a11737ed97d03b30472d"
 "checksum x11-dl 2.18.3 (registry+https://github.com/rust-lang/crates.io-index)" = "940586acb859ea05c53971ac231685799a7ec1dee66ac0bccc0e6ad96e06b4e3"
 "checksum xml-rs 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3c1cb601d29fe2c2ac60a2b2e5e293994d87a1f6fa9687a31a15270f909be9c2"
