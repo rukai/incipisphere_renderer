@@ -5,15 +5,13 @@ use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::buffer::cpu_pool::CpuBufferPool;
 use vulkano::command_buffer::{DynamicState, AutoCommandBufferBuilder};
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 use vulkano::device::{Device, Queue, DeviceExtensions};
 use vulkano::format::Format;
 use vulkano::framebuffer::{Framebuffer, FramebufferAbstract, Subpass, RenderPassAbstract};
 use vulkano::image::SwapchainImage;
 use vulkano::image::attachment::AttachmentImage;
 use vulkano::instance::{Instance, PhysicalDevice};
-use vulkano::pipeline::GraphicsPipeline;
-use vulkano::pipeline::vertex::SingleBufferDefinition;
+use vulkano::pipeline::{GraphicsPipeline, GraphicsPipelineAbstract};
 use vulkano::pipeline::viewport::Viewport;
 use vulkano::swapchain::{Surface, Swapchain, SurfaceTransform, AcquireError, PresentMode, SwapchainCreationError};
 use vulkano::swapchain;
@@ -62,12 +60,12 @@ pub struct Render {
     framebuffers:           Vec<Arc<FramebufferAbstract + Send + Sync>>,
     vs_uniform_buffer_pool: CpuBufferPool<vs::ty::VSData>,
     fs_uniform_buffer_pool: CpuBufferPool<fs::ty::FSData>,
-    vertex_buffer_sphere: Arc<CpuAccessibleBuffer<[Vertex]>>,
+    vertex_buffer_sphere:   Arc<CpuAccessibleBuffer<[Vertex]>>,
 }
 
 struct Pipelines {
-    standard:  Arc<GraphicsPipeline<SingleBufferDefinition<Vertex>, Box<PipelineLayoutAbstract + Send + Sync>, Arc<RenderPassAbstract + Send + Sync>>>,
-    wireframe: Arc<GraphicsPipeline<SingleBufferDefinition<Vertex>, Box<PipelineLayoutAbstract + Send + Sync>, Arc<RenderPassAbstract + Send + Sync>>>,
+    standard:  Arc<GraphicsPipelineAbstract + Send + Sync>,
+    wireframe: Arc<GraphicsPipelineAbstract + Send + Sync>,
 }
 
 impl Render {
@@ -177,10 +175,10 @@ impl Render {
         render_pass: Arc<RenderPassAbstract + Send + Sync>,
         dimensions: [f32; 2],
         wireframe: bool)
-        -> Arc<GraphicsPipeline<SingleBufferDefinition<Vertex>, Box<PipelineLayoutAbstract + Send + Sync>, Arc<RenderPassAbstract + Send + Sync>>>
+        -> Arc<GraphicsPipelineAbstract + Send + Sync>
     {
         let builder = GraphicsPipeline::start()
-            .vertex_input_single_buffer()
+            .vertex_input_single_buffer::<Vertex>()
             .vertex_shader(vs.main_entry_point(), ())
             .triangle_list()
             .viewports(iter::once(Viewport {
@@ -278,7 +276,7 @@ impl Render {
                         .add_buffer(fs_uniform_buffer).unwrap()
                         .build().unwrap();
 
-                    cbb = cbb.draw(pipeline.clone(), &DynamicState::none(), self.vertex_buffer_sphere.clone(), descriptor_set, ()).unwrap()
+                    cbb = cbb.draw(pipeline.clone(), &DynamicState::none(), vec!(self.vertex_buffer_sphere.clone()), descriptor_set, ()).unwrap()
                 }
             }
         }
