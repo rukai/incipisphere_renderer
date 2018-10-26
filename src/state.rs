@@ -5,10 +5,11 @@ use glm::TVec3;
 use winit_input_helper::WinitInputHelper;
 
 pub struct State {
-    pub camera: Camera,
-    pub render_mode: RenderMode,
-    pub run: bool,
-    pub entities: Vec<Entity>,
+    pub camera:         Camera,
+    pub render_mode:    RenderMode,
+    pub run:            bool,
+    pub window_resized: bool,
+    pub entities:       Vec<Entity>,
 }
 
 impl State {
@@ -44,12 +45,15 @@ impl State {
         State {
             render_mode: RenderMode::Standard,
             run: true,
+            window_resized: false,
             camera,
             entities,
         }
     }
 
     pub fn update(&mut self, input: &WinitInputHelper) {
+        self.window_resized = input.window_resized().is_some();
+
         if input.key_pressed(VirtualKeyCode::Z) {
             self.render_mode = match self.render_mode {
                 RenderMode::Standard => { RenderMode::Wireframe }

@@ -23,8 +23,8 @@ fn main() {
     let mut input = WinitInputHelper::new();
 
     while !input.quit() {
-        render.draw(&state);
         input.update(&mut events_loop);
         state.update(&input);
+        render.draw(&state);
     }
 }

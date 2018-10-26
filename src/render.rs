@@ -223,10 +223,22 @@ impl Render {
     }
 
     pub fn draw(&mut self, state: &State) {
+        // The user resized the window, recreate it.
+        // We cant just rely on the swapchain being out of date because some drivers dont tell you its out of date.
+        if state.window_resized {
+            self.recreate_swapchain();
+        }
+
         loop {
             if self.draw_inner(state) {
+                // draw was succesfull, now get out of here.
                 return
             }
+
+            // The swapchain is out of date and needs to be recreated.
+            // We cant just rely on winit telling us the user resized the window as that would be a
+            // race condition. The window could be resized after polling for events but before
+            // the draw actually occurs.
             self.recreate_swapchain();
         }
     }
