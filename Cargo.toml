@@ -5,10 +5,10 @@ license = "MIT"
 authors = ["Lucas Kent <rubickent@gmail.com>"]
 
 [dependencies]
-vulkano = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
-vulkano-win = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
-vulkano-shaders = { git = "https://github.com/rukai/vulkano", branch = "proc_macro_2_0" }
+vulkano = { git = "https://github.com/vulkano-rs/vulkano" }
+vulkano-win = { git = "https://github.com/vulkano-rs/vulkano" }
+vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano" }
 winit = "0.17"
 genmesh = "0.6"
-nalgebra-glm = "0.1"
+nalgebra-glm = "0.2"
 winit_input_helper = "0.1"
