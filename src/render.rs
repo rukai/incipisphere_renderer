@@ -106,27 +106,6 @@ impl Render {
         let vs = vs::Shader::load(device.clone()).unwrap();
         let fs = fs::Shader::load(device.clone()).unwrap();
 
-        let (render_pass, pipelines, framebuffers) = Render::pipelines(&vs, &fs, device.clone(), swapchain.clone(), &images);
-
-        let vs_uniform_buffer_pool = CpuBufferPool::<vs::ty::VSData>::new(device.clone(), BufferUsage::all());
-        let fs_uniform_buffer_pool = CpuBufferPool::<fs::ty::FSData>::new(device.clone(), BufferUsage::all());
-
-        let sphere: Vec<_> = IcoSphere::subdivide(4)
-            .vertex(|v| Vertex { position: v.pos.into() })
-            .vertices()
-            .collect();
-        let vertex_buffer_sphere = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), sphere.iter().cloned()).unwrap();
-
-        Render { surface, device, future, swapchain, width, height, queue, vs, fs, pipelines, render_pass, framebuffers, vs_uniform_buffer_pool, fs_uniform_buffer_pool, vertex_buffer_sphere }
-    }
-
-    fn pipelines(
-        vs: &vs::Shader,
-        fs: &fs::Shader,
-        device: Arc<Device>,
-        swapchain: Arc<Swapchain<Window>>,
-        images: &[Arc<SwapchainImage<Window>>]
-    ) -> (Arc<RenderPassAbstract + Send + Sync>, Pipelines, Vec<Arc<FramebufferAbstract + Send + Sync>>) {
         let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
             attachments: {
                 color: {
@@ -148,6 +127,27 @@ impl Render {
             }
         ).unwrap()) as Arc<RenderPassAbstract + Send + Sync>;
 
+        let (pipelines, framebuffers) = Render::pipelines(render_pass.clone(), &vs, &fs, device.clone(), &images);
+
+        let vs_uniform_buffer_pool = CpuBufferPool::<vs::ty::VSData>::new(device.clone(), BufferUsage::all());
+        let fs_uniform_buffer_pool = CpuBufferPool::<fs::ty::FSData>::new(device.clone(), BufferUsage::all());
+
+        let sphere: Vec<_> = IcoSphere::subdivide(4)
+            .vertex(|v| Vertex { position: v.pos.into() })
+            .vertices()
+            .collect();
+        let vertex_buffer_sphere = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), sphere.iter().cloned()).unwrap();
+
+        Render { surface, device, future, swapchain, width, height, queue, vs, fs, pipelines, render_pass, framebuffers, vs_uniform_buffer_pool, fs_uniform_buffer_pool, vertex_buffer_sphere }
+    }
+
+    fn pipelines(
+        render_pass: Arc<RenderPassAbstract + Send + Sync>,
+        vs: &vs::Shader,
+        fs: &fs::Shader,
+        device: Arc<Device>,
+        images: &[Arc<SwapchainImage<Window>>]
+    ) -> (Pipelines, Vec<Arc<FramebufferAbstract + Send + Sync>>) {
         let dimensions = images[0].dimensions();
         let depth_buffer = AttachmentImage::transient(device.clone(), dimensions, Format::D16Unorm).unwrap();
 
@@ -161,11 +161,12 @@ impl Render {
         }).collect::<Vec<_>>();
 
         let dimensions = [dimensions[0] as f32, dimensions[1] as f32];
+
         let standard  = Render::pipeline(vs, fs, device.clone(), render_pass.clone(), dimensions, false);
         let wireframe = Render::pipeline(vs, fs, device.clone(), render_pass.clone(), dimensions, true);
         let pipelines = Pipelines { standard, wireframe };
 
-        (render_pass, pipelines, framebuffers)
+        (pipelines, framebuffers)
     }
 
     fn pipeline(
@@ -211,8 +212,7 @@ impl Render {
                     self.height = height;
                     self.swapchain = new_swapchain.clone();
 
-                    let (render_pass, pipelines, framebuffers) = Render::pipelines(&self.vs, &self.fs, self.device.clone(), new_swapchain, &new_images);
-                    self.render_pass = render_pass;
+                    let (pipelines, framebuffers) = Render::pipelines(self.render_pass.clone(), &self.vs, &self.fs, self.device.clone(), &new_images);
                     self.pipelines = pipelines;
                     self.framebuffers = framebuffers;
                 }
