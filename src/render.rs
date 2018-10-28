@@ -1,5 +1,3 @@
-use winit::{Window, WindowBuilder, EventsLoop};
-use vulkano_win;
 use vulkano_win::VkSurfaceBuild;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::buffer::cpu_pool::CpuBufferPool;
@@ -17,7 +15,9 @@ use vulkano::swapchain::{Surface, Swapchain, SurfaceTransform, AcquireError, Pre
 use vulkano::swapchain;
 use vulkano::sync;
 use vulkano::sync::{GpuFuture, FlushError};
-use vulkano_shaders::vulkano_shader;
+use vulkano_win;
+use winit::{Window, WindowBuilder, EventsLoop};
+
 use genmesh::generators::IcoSphere;
 use genmesh::{MapToVertices, Vertices};
 use glm;
@@ -33,16 +33,18 @@ use state::{State, RenderMode, EntityType};
 struct Vertex { position: [f32; 3] }
 impl_vertex!(Vertex, position);
 
-vulkano_shader!{
-    mod_name: vs,
-    ty: "vertex",
-    path: "shaders/vertex.glsl",
+mod vs {
+    crate::vulkano_shaders::shader!{
+        ty: "vertex",
+        path: "shaders/vertex.glsl",
+    }
 }
 
-vulkano_shader!{
-    mod_name: fs,
-    ty: "fragment",
-    path: "shaders/fragment.glsl",
+mod fs {
+    crate::vulkano_shaders::shader!{
+        ty: "fragment",
+        path: "shaders/fragment.glsl",
+    }
 }
 
 pub struct Render {

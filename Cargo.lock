@@ -345,7 +345,7 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cfg-if 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -361,7 +361,7 @@ dependencies = [
 
 [[package]]
 name = "matrixmultiply"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "rawpointer 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -391,7 +391,7 @@ dependencies = [
  "cocoa 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "foreign-types 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc-foundation 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc_id 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -404,13 +404,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "nalgebra"
-version = "0.16.5"
+version = "0.16.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "alga 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "approx 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "generic-array 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "matrixmultiply 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrixmultiply 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -424,7 +424,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "alga 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "approx 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "nalgebra 0.16.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nalgebra 0.16.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -671,7 +671,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "syn"
-version = "0.15.14"
+version = "0.15.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.20 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -705,7 +705,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "vk-sys"
 version = "0.3.3"
-source = "git+https://github.com/vulkano-rs/vulkano#d8d5b58c4337a514a9f2a37c1907a7e48d687dcd"
+source = "git+https://github.com/vulkano-rs/vulkano#7189c7fa842e5bb6df2918b89d1ac73763261a18"
 
 [[package]]
 name = "void"
@@ -715,7 +715,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "vulkano"
 version = "0.10.0"
-source = "git+https://github.com/vulkano-rs/vulkano#d8d5b58c4337a514a9f2a37c1907a7e48d687dcd"
+source = "git+https://github.com/vulkano-rs/vulkano#7189c7fa842e5bb6df2918b89d1ac73763261a18"
 dependencies = [
  "crossbeam 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -729,18 +729,18 @@ dependencies = [
 [[package]]
 name = "vulkano-shaders"
 version = "0.10.0"
-source = "git+https://github.com/vulkano-rs/vulkano#d8d5b58c4337a514a9f2a37c1907a7e48d687dcd"
+source = "git+https://github.com/vulkano-rs/vulkano#7189c7fa842e5bb6df2918b89d1ac73763261a18"
 dependencies = [
  "proc-macro2 0.4.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "shaderc 0.3.11 (registry+https://github.com/rust-lang/crates.io-index)",
- "syn 0.15.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 0.15.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "vulkano-win"
 version = "0.10.0"
-source = "git+https://github.com/vulkano-rs/vulkano#d8d5b58c4337a514a9f2a37c1907a7e48d687dcd"
+source = "git+https://github.com/vulkano-rs/vulkano#7189c7fa842e5bb6df2918b89d1ac73763261a18"
 dependencies = [
  "cocoa 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "metal-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -829,7 +829,7 @@ dependencies = [
  "core-graphics 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "percent-encoding 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -908,14 +908,14 @@ dependencies = [
 "checksum libloading 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "9c3ad660d7cb8c5822cd83d10897b0f1f1526792737a179e73896152f85b88c2"
 "checksum libm 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "03c0bb6d5ce1b5cc6fd0578ec1cbc18c9d88b5b591a5c7c1d6c6175e266a0819"
 "checksum lock_api 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "775751a3e69bde4df9b38dd00a1b5d6ac13791e4223d4a0506577f0dd27cfb7a"
-"checksum log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "d4fcce5fa49cc693c312001daf1d13411c4a5283796bac1084299ea3e567113f"
+"checksum log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c84ec4b527950aa83a329754b01dbe3f58361d1c5efacd1f6d68c494d08a17c6"
 "checksum malloc_buf 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
-"checksum matrixmultiply 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)" = "cac1a66eab356036af85ea093101a14223dc6e3f4c02a59b7d572e5b93270bf7"
+"checksum matrixmultiply 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)" = "dcad67dcec2d58ff56f6292582377e6921afdf3bfbd533e26fb8900ae575e002"
 "checksum memmap 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e2ffa2c986de11a9df78620c01eeaaf27d94d3ff02bf81bfcca953102dd0c6ff"
 "checksum memoffset 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0f9dc261e2b62d7a622bf416ea3c5245cdd5d9a7fcc428c0d06804dfce1775b3"
 "checksum metal-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)" = "4b77b2a59798a094aa3b06df84ca3618f63ca63abfd6e270a17777fd53f38d6b"
 "checksum mint 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c9e6c29b4bb0155117ea1a61520406c975673ee71b0287323f06d1a8d69c4a7c"
-"checksum nalgebra 0.16.5 (registry+https://github.com/rust-lang/crates.io-index)" = "cc782b799c55698d80b61b43458f0c1a1379900bfd5b26d14a1241967b4e35e0"
+"checksum nalgebra 0.16.6 (registry+https://github.com/rust-lang/crates.io-index)" = "4900fc7a38e6097088904932dcaa76db0d89353c13f8f9aac133a2b0b8987f0d"
 "checksum nalgebra-glm 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c2937001a256c8fd2c77e4d6bc5f7fe5e1cbea33da4cc0548336655945dbca1e"
 "checksum nix 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d37e713a259ff641624b6cb20e3b12b2952313ba36b6823c0f16e6cfd9e5de17"
 "checksum nodrop 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "9a2228dca57108069a5262f2ed8bd2e82496d2e074a06d1ccc7ce1687b6ae0a2"
@@ -947,7 +947,7 @@ dependencies = [
 "checksum smallvec 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)" = "153ffa32fd170e9944f7e0838edf824a754ec4c1fc64746fcc9fe1f8fa602e5d"
 "checksum smithay-client-toolkit 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f1609083d6bca3991a3c648d80ae16e1764d70881c3321bee1c915149073d605"
 "checksum stable_deref_trait 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "dba1a27d3efae4351c8051072d619e3ade2820635c3958d826bfea39d59b54c8"
-"checksum syn 0.15.14 (registry+https://github.com/rust-lang/crates.io-index)" = "baaba45c6bf60fe29aaf241fa33306c0b75c801edea8378263a8f043b09a5634"
+"checksum syn 0.15.15 (registry+https://github.com/rust-lang/crates.io-index)" = "0a9c2bf1e53c21704a7cce1b2a42768f1ae32a6777108a0d7f1faa4bfe7f7c04"
 "checksum typenum 1.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "612d636f949607bdf9b123b4a6f6d966dedf3ff669f7f045890d3a4a73948169"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
 "checksum unreachable 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "382810877fe448991dfc7f0dd6e3ae5d58088fd0ea5e35189655f84e6814fa56"
