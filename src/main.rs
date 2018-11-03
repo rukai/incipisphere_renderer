@@ -1,17 +1,10 @@
-#[macro_use]
-extern crate vulkano;
-extern crate vulkano_shaders;
-extern crate winit;
-extern crate vulkano_win;
-extern crate genmesh;
 extern crate nalgebra_glm as glm;
-extern crate winit_input_helper;
 
 mod render;
 mod state;
 
-use render::Render;
-use state::State;
+use crate::render::Render;
+use crate::state::State;
 
 use winit::EventsLoop;
 use winit_input_helper::WinitInputHelper;

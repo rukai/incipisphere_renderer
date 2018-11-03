@@ -20,28 +20,28 @@ use winit::{Window, WindowBuilder, EventsLoop};
 
 use genmesh::generators::IcoSphere;
 use genmesh::{MapToVertices, Vertices};
-use glm;
+use crate::glm;
 
 use std::iter;
 use std::sync::Arc;
 use std::mem;
 use std::f32::consts::FRAC_PI_2;
 
-use state::{State, RenderMode, EntityType};
+use crate::state::{State, RenderMode, EntityType};
 
 #[derive(Debug, Clone)]
 struct Vertex { position: [f32; 3] }
-impl_vertex!(Vertex, position);
+vulkano::impl_vertex!(Vertex, position);
 
 mod vs {
-    crate::vulkano_shaders::shader!{
+    vulkano_shaders::shader!{
         ty: "vertex",
         path: "shaders/vertex.glsl",
     }
 }
 
 mod fs {
-    crate::vulkano_shaders::shader!{
+    vulkano_shaders::shader!{
         ty: "fragment",
         path: "shaders/fragment.glsl",
     }
@@ -108,7 +108,7 @@ impl Render {
         let vs = vs::Shader::load(device.clone()).unwrap();
         let fs = fs::Shader::load(device.clone()).unwrap();
 
-        let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
+        let render_pass = Arc::new(vulkano::single_pass_renderpass!(device.clone(),
             attachments: {
                 color: {
                     load: Clear,
