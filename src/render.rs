@@ -20,7 +20,6 @@ use winit::{Window, WindowBuilder, EventsLoop};
 
 use genmesh::generators::IcoSphere;
 use genmesh::{MapToVertices, Vertices};
-use crate::glm;
 
 use std::iter;
 use std::sync::Arc;

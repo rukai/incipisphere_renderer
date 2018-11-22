@@ -11,5 +11,5 @@ vulkano-win = { git = "https://github.com/vulkano-rs/vulkano" }
 vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano" }
 winit = "0.18"
 genmesh = "0.6"
-nalgebra-glm = "0.2"
+glm = { version = "0.2", package = "nalgebra-glm" }
 winit_input_helper = "0.2"

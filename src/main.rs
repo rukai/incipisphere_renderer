@@ -1,5 +1,3 @@
-extern crate nalgebra_glm as glm;
-
 mod render;
 mod state;
 

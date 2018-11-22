@@ -1,6 +1,5 @@
 use winit::VirtualKeyCode;
-use crate::glm;
-use crate::glm::TVec3;
+use glm::TVec3;
 
 use winit_input_helper::WinitInputHelper;
 
