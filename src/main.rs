@@ -1,8 +1,8 @@
 mod render;
 mod state;
 
-use crate::render::Render;
-use crate::state::State;
+use render::Render;
+use state::State;
 
 use winit::EventsLoop;
 use winit_input_helper::WinitInputHelper;
