@@ -6,10 +6,10 @@ authors = ["Lucas Kent <rubickent@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-vulkano = { git = "https://github.com/vulkano-rs/vulkano" }
-vulkano-win = { git = "https://github.com/vulkano-rs/vulkano" }
-vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano" }
-winit = "0.18"
+vulkano = "0.12"
+vulkano-win = "0.12"
+vulkano-shaders = "0.12"
+winit = "0.19"
 genmesh = "0.6"
 glm = { version = "0.2", package = "nalgebra-glm" }
-winit_input_helper = "0.2"
+winit_input_helper = "0.3"
